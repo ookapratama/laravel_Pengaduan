@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Data Tanggapan'])
+@extends('layouts.app', ['title' => 'Data Pelanggan'])
 
 @section('content')
     @push('styles')
@@ -28,8 +28,11 @@
                                             <tr>
                                                 <th class="text-center">#</th>
                                                 <th>Nama Pengadu</th>
-                                                <th>Tanggapan</th>
-                                                <th>Tanggal tanggapan</th>
+                                                <th>Email</th>
+                                                <th>No Telp</th>
+                                                <th>Alamat</th>
+                                                <th>Jenis kelamin</th>
+                                                <th>Tgl terdaftar</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -37,9 +40,12 @@
                                             @foreach ($data as $i => $v)
                                                 <tr>
                                                     <td>{{ ++$i }}</td>
-                                                    <td>{{ $v->keluhan->pelanggan->nama_222406 }}</td>
-                                                    <td>{{ $v->tanggapan_222406 }}</td>
-                                                    <td>{{ $v->tgl_tanggapan_222406 }}</td>
+                                                    <td>{{ $v->nama_222406 }}</td>
+                                                    <td>{{ $v->email_222406 }}</td>
+                                                    <td>{{ $v->telepon_222406 }}</td>
+                                                    <td>{{ $v->alamat_222406 }}</td>
+                                                    <td>{{ $v->jkl_222406 }}</td>
+                                                    <td>{{ $v->tgl_terdaftar_222406 }}</td>
                                                     <td>
                                                         <a href="" data-id="{{ $v->id }}" data-toggle="modal"
                                                             data-target="#modal-form" class="modalEdit">
@@ -48,7 +54,7 @@
                                                                 Edit
                                                             </button>
                                                         </a>
-                                                        <button onclick="deleteData({{ $v->id }}, 'tanggapan')"
+                                                        <button onclick="deleteData({{ $v->id }}, 'pelanggan')"
                                                             class="btn btn-icon btn-danger btn-sm me-1 modalDelete">
                                                             Hapus
                                                         </button>
@@ -67,7 +73,7 @@
     </div>
 
     <!-- Modal for Add/Edit Account -->
-    @include('pages.admin.tanggapan.form')
+    @include('pages.admin.pelanggan.form')
 
     @push('scripts')
         <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
@@ -79,10 +85,10 @@
 
                 // Event untuk tombol Tambah Data Baru
                 $('#btn-add').on('click', function() {
-                    $('#modalAddLabel').text('Tambah Tanggapan');
+                    $('#modalAddLabel').text('Tambah Pelanggan');
                     $('#submitUpdate').text('Tambah');
                     $('#methodType').val('POST');
-                    $('#actionURL').val('{{ route('tanggapan.store') }}'); // URL untuk store
+                    $('#actionURL').val('{{ route('pelanggan.store') }}'); // URL untuk store
                     $('#formSubmit')[0].reset(); // Reset form
                     $('#formId').val('');
                     $('#modal-form').modal('show');
@@ -94,15 +100,15 @@
                     const id = $(this).data('id');
 
                     // Set ke mode edit
-                    $('#modalAddLabel').text('Update Tanggapan');
+                    $('#modalAddLabel').text('Update Pelanggan');
                     $('#submitUpdate').text('Save');
                     $('#methodType').val('POST'); // Gunakan method PUT untuk update
-                    $('#actionURL').val('{{ url('admin/tanggapan/update') }}'); // URL update
+                    $('#actionURL').val('{{ url('admin/pelanggan/update') }}'); // URL update
 
                     // Ambil data dengan AJAX berdasarkan id
                     $.ajax({
-                        // url: '{{ url('admin/tanggapan/edit') }}', // Pastikan route tersedia
-                        url: '{{ url('admin/tanggapan/edit') }}/' + id, // Pastikan route tersedia
+                        // url: '{{ url('admin/pelanggan/edit') }}', // Pastikan route tersedia
+                        url: '{{ url('admin/pelanggan/edit') }}/' + id, // Pastikan route tersedia
                         type: 'GET',
                         data: {
                             id: id
@@ -110,9 +116,12 @@
                         success: function(response) {
                             // Isi modal dengan data dari server
                             $('#formId').val(response.data.id);
-                            $('#id_keluhan_222406').val(response.data.id_keluhan_222406);
-                            $('#tanggapan_222406').val(response.data.tanggapan_222406);
-                            $('#tgl_tanggapan_222406').val(response.data.tgl_tanggapan_222406);
+                            $('#nama_222406').val(response.data.nama_222406);
+                            $('#email_222406').val(response.data.email_222406);
+                            $('#tgl_terdaftar_222406').val(response.data.tgl_terdaftar_222406);
+                            $('#jkl_222406').val(response.data.jkl_222406);
+                            $('#telepon_222406').val(response.data.telepon_222406);
+                            $('#alamat_222406').val(response.data.alamat_222406);
 
                             // Tampilkan modal
                             $('#modal-form').modal('show');
@@ -178,7 +187,7 @@
                             data: {
                                 _token: '{{ csrf_token() }}'
                             },
-                            url: "{{ url('admin/tanggapan') }}/" + id,
+                            url: "{{ url('admin/pelanggan') }}/" + id,
                             success: function(response) {
                                 if (response) {
                                     swal("Deleted", "Data has been deleted", "success").then(() =>

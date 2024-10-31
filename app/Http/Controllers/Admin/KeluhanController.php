@@ -30,9 +30,46 @@ class KeluhanController extends Controller
     {
 
         $menu = $this->menu;
-        
-        Keluhan_222406::create($request->all());
+        $data = Keluhan_222406::create($request->all());
 
-        return redirect()->route('keluhan.index');
+        // return redirect()->route('keluhan.index');
+        return response()->json([
+            'data' => $data,
+            'success' => true
+        ]);
+    }
+
+    public function edit(Request $request)
+    {
+
+        $menu = $this->menu;
+        $data = Keluhan_222406::find($request->id);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+
+        $menu = $this->menu;
+        $req = $request->all();
+        // dd($request->all());
+        $data = Keluhan_222406::find($request->id);
+        $data->update($req);
+
+
+        return response()->json([
+            'data' => $data,
+            'success' => true
+        ]);
+    }
+
+    public function delete($id)
+    {
+        $user = Keluhan_222406::findOrFail($id);
+        $user->delete();
+        return response()->json(['status' => 'success', 'message' => 'keluhan delete']);
     }
 }

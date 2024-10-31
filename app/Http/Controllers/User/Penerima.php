@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\AnggotaRumahTangga;
+use App\Models\KategoriKeluhan_222406;
 use App\Models\Keluhan_222406;
 use App\Models\KepalaRumah;
 use App\Models\KetAset;
@@ -27,12 +28,8 @@ class Penerima extends Controller
     public function index()
     {
         $menu = $this->menu;
-        // $datas = PenerimaPKH::latest()->first();
-        // $datas = PenerimaPKH::get();
-        // $dataArt = AnggotaRumahTangga::get();
-        // $datas = PenerimaPKH::orderByDesc('id')->get();
-        // return view('pages.user.permintaan', compact('menu', 'datas', 'dataArt'));
-        return view('pages.user.permintaan', compact('menu'));
+        $kategori = KategoriKeluhan_222406::all();
+        return view('pages.user.permintaan', compact('menu', 'kategori'));
     }
 
     /**
@@ -69,6 +66,8 @@ class Penerima extends Controller
         $r['id_pelanggan_222406'] = $getPelanggan->id;
         $r['tgl_keluhan_222406'] = Carbon::now();
         $r['status_keluhan_222406'] = 'Diproses';
+
+        
         // dd($r);
         Keluhan_222406::create($r);
 

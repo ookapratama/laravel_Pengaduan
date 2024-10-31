@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Data Akun'])
+@extends('layouts.app', ['title' => 'Data User'])
 
 @section('content')
     @push('styles')
@@ -9,7 +9,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Data Akun</h1>
+                <h1>Data {{ Str::ucfirst($menu) }} </h1>
             </div>
 
             <div class="section-body">
@@ -18,8 +18,8 @@
                         <div class="card">
                             <div class="card-body">
                                 <!-- Add Account Button -->
-                                <a href="#" data-toggle="modal" data-target="#modal-add"
-                                    class="btn btn-success text-white my-3" id="btn-add">Tambah Data</a>
+                                <button type="button" data-toggle="modal" data-target="#modal-form"
+                                    class="btn btn-success text-white my-3" id="btn-add">Tambah Data</button>
 
                                 <!-- Account Table -->
                                 <div class="table-responsive">
@@ -27,7 +27,8 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-center">#</th>
-                                                <th>Name</th>
+                                                <th>Nama</th>
+                                                <th>Email</th>
                                                 <th>Role</th>
                                                 <th>Action</th>
                                             </tr>
@@ -38,16 +39,18 @@
                                                     <td>{{ ++$i }}</td>
                                                     <td>{{ $v->name }}</td>
                                                     <td>{{ $v->email }}</td>
+                                                    <td>{{ $v->role }}</td>
                                                     <td>
                                                         <a href="" data-id="{{ $v->id }}" data-toggle="modal"
-                                                            data-target="#modal-add" class="modalEdit">
+                                                            data-target="#modal-form" class="modalEdit">
                                                             <button type="button"
                                                                 class="btn btn-icon btn-warning btn-sm me-1">
                                                                 Edit
                                                             </button>
                                                         </a>
-                                                        <button  onclick="deleteData({{ $v->id }}, 'users')" class="btn btn-icon btn-danger btn-sm me-1 modalDelete">
-                                                                Hapus
+                                                        <button onclick="deleteData({{ $v->id }}, 'akun')"
+                                                            class="btn btn-icon btn-danger btn-sm me-1 modalDelete">
+                                                            Hapus
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -64,7 +67,7 @@
     </div>
 
     <!-- Modal for Add/Edit Account -->
-    @include('pages.admin.akun.form-add')
+    @include('pages.admin.akun.form')
 
     @push('scripts')
         <script src="{{ asset('library/datatables/media/js/jquery.dataTables.min.js') }}"></script>
@@ -74,56 +77,84 @@
             $(document).ready(function() {
                 $('#table-penerima').DataTable();
 
-                // Add button click
-                $('#btn-add').click(function() {
-                    $('#form-account').trigger('reset');
-                    $('#form-account').removeData('id');
-                    $('#modal-add .modal-title').text('Tambah Akun');
+                // Event untuk tombol Tambah Data Baru
+                $('#btn-add').on('click', function() {
+                    $('#modalAddLabel').text('Tambah User');
+                    $('#submitUpdate').text('Tambah');
+                    $('#methodType').val('POST');
+                    $('#actionURL').val('{{ route('akun.store') }}'); // URL untuk store
+                    $('#formSubmit')[0].reset(); // Reset form
+                    $('#formId').val('');
+                    $('#modal-form').modal('show');
                 });
 
-                // Edit button click
-                $('.btn-edit').click(function() {
-                    var userId = $(this).data('id');
+                // Event handler untuk tombol Edit
+                $(document).on('click', '.modalEdit', function(e) {
+                    e.preventDefault();
+                    const id = $(this).data('id');
+
+                    // Set ke mode edit
+                    $('#modalAddLabel').text('Update User');
+                    $('#submitUpdate').text('Save');
+                    $('#methodType').val('POST'); // Gunakan method PUT untuk update
+                    $('#actionURL').val('{{ url('admin/akun/update') }}'); // URL update
+
+                    // Ambil data dengan AJAX berdasarkan id
                     $.ajax({
-                        url: "{{ url('admin/akun') }}/" + userId + "/edit",
-                        method: 'GET',
-                        success: function(response) {
-                            $('#form-account').find('input[name="name"]').val(response.name);
-                            $('#form-account').find('select[name="role"]').val(response.role);
-                            $('#form-account').data('id', userId);
-                            $('#modal-add .modal-title').text('Edit Akun');
-                            $('#modal-add').modal('show');
+                        // url: '{{ url('admin/akun/edit') }}', // Pastikan route tersedia
+                        url: '{{ url('admin/akun/edit') }}/' + id, // Pastikan route tersedia
+                        type: 'GET',
+                        data: {
+                            id: id
                         },
-                        error: function(xhr) {
-                            console.error(xhr);
-                            swal("Error", "Failed to fetch user data.", "error");
+                        success: function(response) {
+                            console.log(response);
+                            // Isi modal dengan data dari server
+                            $('#formId').val(response.id);
+                            $('#name').val(response.name);
+                            $('#email').val(response.email);
+
+                            // Tampilkan modal
+                            $('#modal-form').modal('show');
+                        },
+                        error: function(error) {
+                            console.error("Error:", error);
                         }
                     });
                 });
 
-                // Form submission (add/update)
-                $('#form-account').on('submit', function(e) {
+                // Submit form untuk Store atau Update menggunakan AJAX
+                $('#formSubmit').on('submit', function(e) {
                     e.preventDefault();
-                    var userId = $('#form-account').data('id');
-                    var ajaxUrl = userId ? "{{ route('akun.update', '') }}/" + userId :
-                        "{{ route('akun.store') }}";
-                    var ajaxMethod = userId ? 'PUT' : 'POST';
+
+                    // Disable tombol submit sementara
+                    $('#submitUpdate').attr('disabled', true);
+
+                    // Persiapan data form dan URL action
+                    const formData = new FormData(this);
+                    const actionURL = $('#actionURL').val();
+                    const method = $('#methodType').val();
 
                     $.ajax({
-                        url: ajaxUrl,
-                        method: ajaxMethod,
-                        data: $(this).serialize(),
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                swal("Success", response.message, "success").then(() => location
-                                    .reload());
-                            } else {
-                                swal("Error", response.message, "error");
-                            }
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        error: function(xhr) {
-                            console.error(xhr);
-                            swal("Error", "Ajax Error.", "error");
+                        url: actionURL,
+                        type: method,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            $('#modal-form').modal('hide');
+                            swal("Sukses", "Data berhasil disimpan", "success").then(() => location
+                                .reload());
+                        },
+                        error: function(error) {
+                            console.error("Error:", error);
+                            swal("Error", "Gagal menyimpan data", "error");
+                        },
+                        complete: function() {
+                            $('#submitUpdate').attr('disabled', false);
                         }
                     });
                 });

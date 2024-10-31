@@ -50,19 +50,25 @@
                         </div>
                     </div>
 
-                   
-                  
-
-
-
-
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="role">Kategori Keluhan </label>
+                        <select name="id_kategori_222406" id="id_kategori_222406" class="form-control" required>
+                            <option value="">-- Pilih --</option>
+                            @foreach ($kategori as $v)
+                                <option value="{{ $v->id }}">{{ $v->nama_kategori_222406 }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md">
                         <div class="form-group">
                             <label>Keluhan</label>
-                            <input type="text" required name="keluhan_222406" placeholder="masukkan keluhan anda" class="form-control " />
+                            <input type="text" required name="keluhan_222406" placeholder="masukkan keluhan anda"
+                                class="form-control " />
                         </div>
                     </div>
                 </div>
@@ -77,8 +83,4 @@
     </form>
 </div>
 
-<script>
-    
-
-    
-</script>
+<script></script>

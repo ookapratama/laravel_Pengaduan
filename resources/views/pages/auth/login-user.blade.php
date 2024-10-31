@@ -54,7 +54,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label>Login sebagai </label>
                                 <select required name="role" class="form-control">
                                     <option value="">-- Pilih --</option>
@@ -65,7 +65,7 @@
                                     please fill in your role
                                 </div>
 
-                            </div>
+                            </div> --}}
 
                             <div class="form-group text-right">
                                 

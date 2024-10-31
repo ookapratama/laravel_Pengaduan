@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AkunController extends Controller
 {
@@ -68,24 +69,20 @@ class AkunController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
         // dd($request->password);
-        $user = User::findOrFail($id);
+        $req = $request->all();
+        $user = User::findOrFail($request->id);
         if ($request->password == null) {
-            unset($request->password);
+            unset($req['password']);
+        }
+        else {
+            $req['password'] = Hash::make($request->password);
         }
 
-        $user->update([
-            'name' => $request->name,
-            'role' => $request->role,
-        ]);
+        $user->update($req);
 
-        if ($request->password) {
-            $user->update([
-                'password' => bcrypt($request->password),
-            ]);
-        }
 
         return response()->json(['status' => 'success', 'message' => 'akun update']);
     }

@@ -39,11 +39,25 @@
                                             @foreach ($data as $i => $v)
                                                 <tr>
                                                     <td>{{ ++$i }}</td>
-                                                    <td>{{ $v->id_pelanggan_222406 }}</td>
+                                                    <td>{{ $v->pelanggan->nama_222406 }}</td>
                                                     <td>{{ $v->keluhan_222406 }}</td>
                                                     <td>{{ $v->tgl_keluhan_222406 }}</td>
-                                                    <td>{{ $v->status_keluhan_222406 }}</td>
-                                                    <td>{{ $v->id_kategori_222406 }}</td>
+                                                    <td>
+                                                        @if ($v->status_keluhan_222406 == 'Diproses')
+                                                            <div class="badge badge-primary">
+                                                                {{ $v->status_keluhan_222406 }}
+                                                            </div>
+                                                        @elseif ($v->status_keluhan_222406 == 'Pending')
+                                                            <div class="badge badge-warning">
+                                                                {{ $v->status_keluhan_222406 }}
+                                                            </div>
+                                                        @else
+                                                            <div class="badge badge-success">
+                                                                {{ $v->status_keluhan_222406 }}
+                                                            </div>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $v->kategori->nama_kategori_222406 }}</td>
                                                     <td>
                                                         <a href="" data-id="{{ $v->id }}" data-toggle="modal"
                                                             data-target="#modal-form" class="modalEdit">
@@ -52,12 +66,10 @@
                                                                 Edit
                                                             </button>
                                                         </a>
-                                                        <a href="" class="">
-                                                            <button type="button"
-                                                                class="btn btn-icon btn-danger btn-sm me-1 modalDelete">
-                                                                Hapus
-                                                            </button>
-                                                        </a>
+                                                        <button onclick="deleteData({{ $v->id }}, 'keluhans')"
+                                                            class="btn btn-icon btn-danger btn-sm me-1 modalDelete">
+                                                            Hapus
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -83,29 +95,97 @@
             $(document).ready(function() {
                 $('#table-penerima').DataTable();
 
-                // edit
-                $('.modalEdit').on('click', function() {
+                // Event untuk tombol tambah data baru
+                $('#btn-add').on('click', function() {
+                    // Set ke mode tambah
+                    $('#modalAddLabel').text('Tambah Keluhan');
+                    $('#submitUpdate').text('Tambah');
+                    $('#methodType').val('POST');
+                    $('#actionURL').val('{{ route('keluhan.store') }}'); // URL store
+                    $('#formSubmit')[0].reset(); // Reset form
+                    $('#formId').val('');
+                    $('#modal-form').modal('show');
+                });
 
-                    let getById = $(this).attr('data-id');
-                    let nama = $('#id_pelanggan_222406').value
-                    console.log(nama);
-                    
+                // Event handler untuk tombol edit
+                $(document).on('click', '.modalEdit', function(e) {
+                    e.preventDefault();
+                    const id = $(this).data('id');
 
+                    // Set ke mode edit
+                    $('#modalAddLabel').text('Update Keluhan');
+                    $('#submitUpdate').text('Save');
+                    $('#methodType').val('POST'); // Gunakan method PUT untuk update
+                    // $('#actionURL').val('{{ url('admin/keluhan') }}/' + id); // URL update
+                    $('#actionURL').val('{{ url('admin/keluhan/update') }}'); // URL update
+
+                    // Ambil data dengan AJAX berdasarkan id
                     $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr(
-                                'content')
+                        // url: '{{ url('admin/keluhan/edit') }}',
+                        url: '{{ url('admin/keluhan/edit') }}/' + id,
+                        type: 'GET',
+                        // data: {
+                        //     id: id
+                        // },
+                        success: function(response) {
+                            // Isi modal dengan data dari server
+                            $('#formId').val(response.data.id);
+                            $('#id_pelanggan_222406').val(response.data.id_pelanggan_222406);
+                            $('#keluhan_222406').val(response.data.keluhan_222406);
+                            $('#tgl_keluhan_222406').val(response.data.tgl_keluhan_222406);
+                            $('#status_keluhan_222406').val(response.data.status_keluhan_222406);
+                            $('#id_kategori_222406').val(response.data.id_kategori_222406);
+
+                            // Tampilkan modal
+                            $('#modal-form').modal('show');
                         },
-                        data: formData,
-                        url: '{{ url("admin/$menu") }}/' + getById,
-                        type: "POST",
-                        dataType: 'json',
-                        processData: false,
-                        contentType: false,
+                        error: function(error) {
+                            console.error("Error:", error);
+                        }
                     });
                 });
 
+                // Store dan Update data dengan AJAX
+                $('#formSubmit').on('submit', function(e) {
+                    e.preventDefault();
+
+                    // Disable tombol submit sementara
+                    $('#submitUpdate').attr('disabled', true);
+
+                    // Persiapan data form dan URL action
+                    const formData = new FormData(this);
+                    const actionURL = $('#actionURL').val();
+                    const method = $('#methodType').val();
+                    for (const [key, value] of formData) {
+                        console.log(`${key}: ${value}\n`);
+                    }
+                    console.log(actionURL);
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url: actionURL,
+                        type: method,
+                        data: formData,
+                        dataType: 'json',
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            $('#modal-form').modal('hide');
+                            swal("Sukses", "Data berhasil disimpan", "success").then(() => location
+                                .reload());
+                        },
+                        error: function(error) {
+                            console.error("Error:", error);
+                            swal("Error", "Gagal menyimpan data", "error");
+                        },
+                        complete: function() {
+                            $('#submitUpdate').attr('disabled', false);
+                        }
+                    });
+                });
             });
+
 
             // Delete account
             const deleteData = (id, tabel) => {
@@ -125,7 +205,7 @@
                             data: {
                                 _token: '{{ csrf_token() }}'
                             },
-                            url: "{{ url('admin/') }}/" + id,
+                            url: "{{ url('admin/keluhan') }}/" + id,
                             success: function(response) {
                                 if (response) {
                                     swal("Deleted", "Data has been deleted", "success").then(() =>

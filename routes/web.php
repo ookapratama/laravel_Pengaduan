@@ -52,7 +52,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Route::resource('/admin', AdminController::class);
     
     Route::resource('/akun', AkunController::class);
-    Route::get('/akun/{akun}/edit', [AkunController::class, 'edit'])->name('akun.edit');
+    Route::get('/akun/edit/{id}', [AkunController::class, 'edit'])->name('akun.edit');
+    Route::post('/akun/update', [AkunController::class, 'update'])->name('akun.update');
+
+    // Route::get('/akun/{akun}/edit', [AkunController::class, 'edit'])->name('akun.edit');
     
     // Keluhan
     Route::prefix('/keluhan')->group(function () {
@@ -60,8 +63,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/tambah', [KeluhanController::class, 'tambah'])->name('keluhan.tambah');
         Route::post('/tambah', [KeluhanController::class, 'store'])->name('keluhan.store');
         Route::get('/edit/{id}', [KeluhanController::class, 'edit'])->name('keluhan.edit');
-        Route::put('/update', [KeluhanController::class, 'update'])->name('keluhan.update');
-        Route::delete('/delete/{id}', [KeluhanController::class, 'delete'])->name('keluhan.delete');
+        Route::post('/update', [KeluhanController::class, 'update'])->name('keluhan.update');
+        Route::delete('/{id}', [KeluhanController::class, 'delete'])->name('keluhan.delete');
     });
     
     // Tanggapan
@@ -70,8 +73,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/tambah', [TanggapanController::class, 'tambah'])->name('tanggapan.tambah');
         Route::post('/tambah', [TanggapanController::class, 'store'])->name('tanggapan.store');
         Route::get('/edit/{id}', [TanggapanController::class, 'edit'])->name('tanggapan.edit');
-        Route::put('/update', [TanggapanController::class, 'update'])->name('tanggapan.update');
-        Route::delete('/delete/{id}', [TanggapanController::class, 'delete'])->name('tanggapan.delete');
+        Route::post('/update', [TanggapanController::class, 'update'])->name('tanggapan.update');
+        Route::delete('/{id}', [TanggapanController::class, 'delete'])->name('tanggapan.delete');
     });
     
     // Pelanggan
@@ -80,8 +83,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/tambah', [PelangganController::class, 'tambah'])->name('pelanggan.tambah');
         Route::post('/tambah', [PelangganController::class, 'store'])->name('pelanggan.store');
         Route::get('/edit/{id}', [PelangganController::class, 'edit'])->name('pelanggan.edit');
-        Route::put('/update', [PelangganController::class, 'update'])->name('pelanggan.update');
-        Route::delete('/delete/{id}', [PelangganController::class, 'delete'])->name('pelanggan.delete');
+        Route::post('/update', [PelangganController::class, 'update'])->name('pelanggan.update');
+        Route::delete('/{id}', [PelangganController::class, 'delete'])->name('pelanggan.delete');
     });
 
 
