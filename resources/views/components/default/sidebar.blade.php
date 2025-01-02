@@ -34,6 +34,10 @@
                         class="far fa-square"></i> <span>Akun</span></a>
             </li>
 
+            <li class="{{ $menu == 'cetak' ? 'active' : '' }}"><a class="nav-link" href="{{ route('cetak.index') }}"><i
+                        class="far fa-square"></i> <span>Cetak Pengaduan</span></a>
+            </li>
+
 
             {{-- <li class="{{ Request::is('blank') ? 'active' : '\' }}"><a class="nav-link" href="{{ route('blank') }}"><i
                         class="far fa-square"></i> <span>Kepala Rumah Tangga</span></a>

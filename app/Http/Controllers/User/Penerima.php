@@ -13,6 +13,7 @@ use App\Models\Pelanggan_222406;
 use App\Models\PenerimaPKH;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class Penerima extends Controller
 {
@@ -67,7 +68,7 @@ class Penerima extends Controller
         $r['tgl_keluhan_222406'] = Carbon::now();
         $r['status_keluhan_222406'] = 'Diproses';
 
-        
+
         // dd($r);
         Keluhan_222406::create($r);
 
@@ -82,10 +83,30 @@ class Penerima extends Controller
     public function show(Request $r)
     {
         $r = $r->all();
-        $r['nik'] = $r['nik']  ?? '';
-        // $getkrt = KepalaRumah::where('nik', $r['nik'])->first();
-        
-        
+        $r['email'] = $r['email']  ?? '';
+        $pelanggan = DB::table('pelanggan_222406s')->where('email_222406', $r['email'])->first();
+
+        if ($pelanggan) {
+            // Query keluhan berdasarkan id pelanggan
+            $keluhan = DB::table('keluhan_222406s')
+                ->join('kategori_keluhan_222406s', 'keluhan_222406s.id_kategori_222406', '=', 'kategori_keluhan_222406s.id')
+                ->where('keluhan_222406s.id_pelanggan_222406', $pelanggan->id)
+                ->select('keluhan_222406s.*', 'kategori_keluhan_222406s.nama_kategori_222406') // Menambahkan nama_kategori dari tabel kategori
+                ->get();
+
+            // Query tanggapan berdasarkan id keluhan
+            $tanggapan = [];
+            foreach ($keluhan as $k) {
+                $tanggapan[] = DB::table('tanggapan_222406s')->where('id_keluhan_222406', $k->id)->get();
+            }
+            // Mempersiapkan data untuk view HTML
+            $html = view('pages.user.data_pengajuan', compact('pelanggan', 'keluhan', 'tanggapan'))->render();
+
+            return response()->json(['html' => $html]);
+        } else {
+            return response()->json(['html' => '<p>No data found</p>']);
+        }
+
         // if ($getkrt) {
         //     $getPenerima = PenerimaPKH::where('kepala_id', $getkrt->id)->first();
         //     $getAset = KetAset::where('kepala_id', $getkrt->id)->first();

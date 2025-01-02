@@ -9,7 +9,7 @@
             <div class="section-header">
                 <div class="d-flex">
                     <button id="buat-permintaan" class="btn btn-primary mr-3">Buat pengaduan</button>
-                    {{-- <button id="cek-permintaan" class="btn btn-info">Cek Status pengaduan</button> --}}
+                    <button id="cek-permintaan" class="btn btn-info">Cek Status pengaduan</button>
                 </div>
 
             </div>
@@ -29,7 +29,7 @@
                     <div class="col-md-5">
                         <div class="form-group">
                             <label for="">Masukkan Email anda</label>
-                            <input required class="form-control" type="text" name="nik" id="nik">
+                            <input required class="form-control" type="text" name="email" id="email">
                         </div>
                         <button id="btn-cari" class="btn btn-primary">
                             Cek Pengajuan
@@ -42,18 +42,15 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">#</th>
-                                        <th class="text-nowrap">Nomor KK</th>
-                                        <th class="text-nowrap">NIK</th>
-                                        <th class="text-nowrap">Alamat</th>
-                                        <th class="text-nowrap">Tempat, Tanggal Lahir</th>
-                                        <th class="text-nowrap">Pekerjaan</th>
-
-                                        <th class="text-nowrap">Status</th>
-                                      
+                                        <th>Nama Pengadu</th>
+                                        <th>Keluhan</th>
+                                        <th>Kategori Keluhan</th>
+                                        <th>Tanggapan</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                   
+                                <tbody id="dataPengajuan">
+
                                 </tbody>
                             </table>
                         </div>
@@ -67,98 +64,6 @@
     </div>
 
     </section>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="modalAll" tabindex="-1" role="dialog" aria-labelledby="artModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="artModalLabel">Detail Kepala Rumah Tangga</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Table to display ART details will be dynamically loaded here -->
-                    <div id="tableAll">
-                        <p>Loading...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="artModal" tabindex="-1" role="dialog" aria-labelledby="artModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="artModalLabel">Detail Anggota Rumah Tangga (ART)</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Table to display ART details will be dynamically loaded here -->
-                    <div id="artTable">
-                        <p>Loading...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Modal untuk Aset -->
-    <div class="modal fade" id="modalAset" tabindex="-1" role="dialog" aria-labelledby="modalAsetLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalAsetLabel">Detail Aset</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="modalAsetContent">
-                    <!-- Detail Aset akan dimuat di sini -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Modal untuk Perumahan -->
-    <div class="modal fade" id="modalRumah" tabindex="-1" role="dialog" aria-labelledby="modalRumahLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalRumahLabel">Detail Perumahan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="modalRumahContent">
-                    <!-- Detail Perumahan akan dimuat di sini -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -195,20 +100,20 @@
 
                 $('#data_pengajuan').hide(); // Show the table if data is available
                 $('#btn-cari').on('click', function() {
-                    let nik = $('#nik').val();
+                    let email = $('#email').val();
 
                     $.ajax({
                         url: "{{ route('permintaan.cek') }}", // Route to fetch data
                         method: 'GET',
                         data: {
-                            nik: nik
+                            email: email
                         },
                         success: function(response) {
                             console.log(response);
 
                             if (response.html) {
                                 $('#data_pengajuan').show(); // Show the table if data is available
-                                $('#data_pengajuan').html(response.html);
+                                $('#dataPengajuan').html(response.html);
                             } else {
                                 $('#data_pengajuan').hide(); // Hide the table if no data
                                 $('#data_pengajuan').html('<p>No data found</p>');
